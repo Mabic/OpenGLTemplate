@@ -66,7 +66,8 @@ std::string Shader::ReadShaderSource(const std::string& shaderPath) const
 GLuint Shader::CompileShader(const std::string & vertexShaderPath, GLenum shaderType) const
 {
 	GLuint shader = glCreateShader(shaderType);
-	const GLchar* vertexShaderSource = ReadShaderSource(vertexShaderPath).c_str();
+	const std::string shaderSource = ReadShaderSource(vertexShaderPath);
+	const GLchar* vertexShaderSource = shaderSource.c_str();
 
 	glShaderSource(shader, 1, &vertexShaderSource, NULL);
 

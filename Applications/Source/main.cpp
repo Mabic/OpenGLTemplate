@@ -15,9 +15,9 @@ Shader* shader;
 
 GLfloat vertices[] = {
 	// Positions         // Colors
-	0.5f, -0.5f, 0.0f,   // Bottom Right
-	-0.5f, -0.5f, 0.0f,  // Bottom Left
-	0.0f,  0.5f, 0.0f,   // Top 
+	0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f, // Bottom Right
+	-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, // Bottom Left
+	0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f // Top 
 };
 
 static void init(void)
@@ -50,8 +50,10 @@ static void init(void)
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 3, (GLvoid*) 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 6, (GLvoid*) 0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 6, (GLvoid*)(sizeof(GL_FLOAT) * 3));
+	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
 }
@@ -68,7 +70,7 @@ void render(void)
 {
 	while (!glfwWindowShouldClose(window))
 	{
-		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		shader->UseProgram();
