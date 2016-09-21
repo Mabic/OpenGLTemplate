@@ -7,9 +7,10 @@
 
 GLFWwindow* window = nullptr;
 
-// VAO, VBO
+// VAO, VBO, EBO
 GLuint VAO;
 GLuint VBO;
+GLuint EBO;
 
 Shader* shader;
 
@@ -19,6 +20,8 @@ GLfloat vertices[] = {
 	-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, // Bottom Left
 	0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f // Top 
 };
+
+GLuint indices[] = { 0, 1, 2 };
 
 static void init(void)
 {
@@ -47,8 +50,11 @@ static void init(void)
 
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 6, (GLvoid*) 0);
 	glEnableVertexAttribArray(0);
@@ -75,7 +81,8 @@ void render(void)
 
 		shader->UseProgram();
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
 		glfwSwapBuffers(window);
