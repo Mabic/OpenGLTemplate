@@ -5,9 +5,11 @@ IF (WIN32)
     INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/GLEW/include )
     INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/GLM )
     INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/GLFW/include )
+    INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/SOIL/include )
 
     LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/GLEW/lib/Release/x64 )
     LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/GLFW/lib-vc2015 )
+    LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/SOIL/lib )
 ENDIF (WIN32)
 
 ADD_SUBDIRECTORY( Applications)
