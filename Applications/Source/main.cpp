@@ -1,6 +1,7 @@
 #define GLEW_STATIC
 #include <GL/glew.h>    // include GLEW and new version of GL on Windows
 #include <GLFW/glfw3.h> // GLFW helper library
+#include <cmath>
 #include <stdio.h>
 
 #include "Shader.h"
@@ -13,6 +14,9 @@ GLuint VBO;
 GLuint EBO;
 
 Shader* shader;
+
+const bool isIndexedDraw = false;
+const bool isDebugEnabled = true;
 
 GLfloat vertices[] = {
 	// Positions         // Colors
@@ -31,12 +35,19 @@ static void init(void)
 		return;
 	}
 
+	// Set all the required options for GLFW
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
 	window = glfwCreateWindow(640, 480, "Hello Triangle", NULL, NULL);
 	if (!window) {
 		fprintf(stderr, "ERROR: could not open window with GLFW3\n");
 		glfwTerminate();
 		return;
 	}
+
 	glfwMakeContextCurrent(window);
 
 	// start GLEW extension handler
@@ -52,9 +63,11 @@ static void init(void)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
+	if (isIndexedDraw) {
+		glGenBuffers(1, &EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
+	}
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 6, (GLvoid*) 0);
 	glEnableVertexAttribArray(0);
@@ -66,6 +79,9 @@ static void init(void)
 
 void uninitialize(void) 
 {
+	if (isIndexedDraw) {
+		glDeleteBuffers(1, &EBO);
+	}
 	glDeleteBuffers(1, &VBO);
 	glDeleteVertexArrays(1, &VAO);
 
@@ -74,6 +90,9 @@ void uninitialize(void)
 
 void render(void)
 {
+	GLfloat offset[] { 0.0f, 0.0f, 0.0f };
+	GLint offsetLocation { -1 };
+
 	while (!glfwWindowShouldClose(window))
 	{
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -81,8 +100,20 @@ void render(void)
 
 		shader->UseProgram();
 		glBindVertexArray(VAO);
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+
+		// change offset variable in shaders	
+		offset[0] = (sin(glfwGetTime()) / 3);
+		offset[1] = (sin(glfwGetTime()) / 4);
+		offset[2] = (sin(glfwGetTime()) / 5);
+		offsetLocation = glGetUniformLocation(shader->GetProgram(), "offset");
+		glUniform3fv(offsetLocation, 1, offset);
+
+		if (isIndexedDraw) {
+			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+		} else {
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+		}
+
 		glBindVertexArray(0);
 
 		glfwSwapBuffers(window);

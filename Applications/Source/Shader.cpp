@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+#include <algorithm>
+#include <iterator>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -23,8 +25,10 @@ Shader::Shader(const std::string& vertexShaderPath, const std::string& fragmentS
 		GLint logSize = 0;
 		glGetProgramiv(m_program, GL_INFO_LOG_LENGTH, &logSize);
 
-		std::vector<GLchar> errorLog(logSize);
+		std::vector<GLchar> errorLog(logSize + 1);
 		glGetProgramInfoLog(m_program, logSize, &logSize, &errorLog[0]);
+
+		std::copy(errorLog.begin(), errorLog.end(), std::ostream_iterator<GLchar>(std::cout));
 	}
 
 	glDetachShader(m_program, vertexShader);
@@ -81,8 +85,10 @@ GLuint Shader::CompileShader(const std::string & vertexShaderPath, GLenum shader
 		GLint logSize = 0;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logSize);
 
-		std::vector<GLchar> errorLog(logSize);
+		std::vector<GLchar> errorLog(logSize + 1);
 		glGetShaderInfoLog(shader, logSize, &logSize, &errorLog[0]);
+		
+		std::copy(errorLog.begin(), errorLog.end(), std::ostream_iterator<GLchar>(std::cout));
 	}
 
 	return shader;

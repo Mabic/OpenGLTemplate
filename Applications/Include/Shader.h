@@ -11,6 +11,7 @@ public:
 	~Shader() = default;
 
 	inline void UseProgram() const { glUseProgram(m_program); }
+	inline const GLuint GetProgram() const { return m_program; }
 private:
 	std::string ReadShaderSource(const std::string& shaderPath) const;
 	GLuint CompileShader(const std::string& vertexShaderPath, GLenum shaderType) const;
