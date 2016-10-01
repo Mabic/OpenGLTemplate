@@ -13,4 +13,4 @@ IF (WIN32)
 ENDIF (WIN32)
 
 INCLUDE( Libraries/CMakeLists.txt )
-ADD_SUBDIRECTORY( Applications )
+INCLUDE( Applications/CMakeLists.txt )
