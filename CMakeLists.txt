@@ -12,4 +12,5 @@ IF (WIN32)
     LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/SOIL/lib )
 ENDIF (WIN32)
 
-ADD_SUBDIRECTORY( Applications)
+INCLUDE( Libraries/CMakeLists.txt )
+ADD_SUBDIRECTORY( Applications )

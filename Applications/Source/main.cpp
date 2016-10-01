@@ -1,32 +1,73 @@
 #define GLEW_STATIC
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <GL/glew.h>    // include GLEW and new version of GL on Windows
 #include <GLFW/glfw3.h> // GLFW helper library
 #include <SOIL.h>
 #include <cmath>
 #include <stdio.h>
 
-#include "Shader.h"
+#include <Shader.h>
 
 GLFWwindow* window = nullptr;
 
-// VAO, VBO, EBO
-GLuint VAO;
-GLuint VBO;
-GLuint EBO;
+const std::string pathToShaders("C:\\Users\\mariu\\OneDrive\\Dokumenty\\Visual Studio 2015\\Projects\\OpenGLTemplate\\Applications\\Resources\\Shaders\\");
+const std::string pathToTextures("C:\\Users\\mariu\\OneDrive\\Dokumenty\\Visual Studio 2015\\Projects\\OpenGLTemplate\\Applications\\Resources\\Textures\\");
 
-Shader* shader;
 
+// VAO, VBO, EBO, TBO
+GLuint VAO{ 0 };
+GLuint VBO{ 0 };
+GLuint EBO{ 0 };
+GLuint TBO[2] { 0, 0 };
+
+// Shader program
+Shader* shader = nullptr;
+
+// Textures
+struct Texture {
+	unsigned char* image;
+	int width, height;
+} texture, lena;
+
+
+// auxillary flags
 const bool isIndexedDraw = false;
 const bool isDebugEnabled = true;
 
 GLfloat vertices[] = {
-	// Positions         // Colors
-	0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f, // Bottom Right
-	-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, // Bottom Left
-	0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f // Top 
+	// Positions         // Colors         // Tex Cords 
+	0.5f, -0.5f, 0.0f,   1.0f, 1.0f, 1.0f, 1.0f, 0.0f, // Bottom Right
+	-0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f, // Bottom Left
+	0.0f,  0.5f, 0.0f,   1.0f, 1.0f, 1.0f, 0.5f, 1.0f  // Top 
 };
 
 GLuint indices[] = { 0, 1, 2 };
+
+static void loadTexture(void)
+{
+	std::string pathToTexture = pathToTextures + "texture.jpg";
+	texture.image = SOIL_load_image(pathToTexture.c_str(), &texture.width, &texture.height, 0, SOIL_LOAD_RGB);
+
+	std::string pathToLena = pathToTextures + "lena.png";
+	lena.image = SOIL_load_image(pathToLena.c_str(), &lena.width, &lena.height, 0, SOIL_LOAD_RGB);
+
+	glGenTextures(2, TBO);
+
+	// texture.jpeg
+	glBindTexture(GL_TEXTURE_2D, TBO[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture.width, texture.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// lena.png
+	glBindTexture(GL_TEXTURE_2D, TBO[1]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, lena.width, lena.height, 0, GL_RGB, GL_UNSIGNED_BYTE, lena.image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	SOIL_free_image_data(texture.image);
+	SOIL_free_image_data(lena.image);
+}
 
 static void init(void)
 {
@@ -55,7 +96,11 @@ static void init(void)
 	glewExperimental = GL_TRUE;
 	glewInit();
 
-	shader = new Shader("vertex.vert", "fragment.frag");
+	glViewport(0, 0, 640, 480);
+
+	shader = new Shader(pathToShaders + "vertex.vert", pathToShaders + "fragment.frag");
+
+	loadTexture();
 
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
@@ -70,16 +115,20 @@ static void init(void)
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
 	}
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 6, (GLvoid*) 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 8, (GLvoid*) 0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 6, (GLvoid*)(sizeof(GL_FLOAT) * 3));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 8, (GLvoid*)(sizeof(GL_FLOAT) * 3));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 8, (GLvoid*)(sizeof(GL_FLOAT) * 6));
+	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void uninitialize(void) 
 {
+	glDeleteBuffers(2, TBO);
 	if (isIndexedDraw) {
 		glDeleteBuffers(1, &EBO);
 	}
@@ -91,8 +140,7 @@ void uninitialize(void)
 
 void render(void)
 {
-	GLfloat offset[] { 0.0f, 0.0f, 0.0f };
-	GLint offsetLocation { -1 };
+	GLint transformLocation { -1 };
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -102,12 +150,21 @@ void render(void)
 		shader->UseProgram();
 		glBindVertexArray(VAO);
 
-		// change offset variable in shaders	
-		offset[0] = (sin(glfwGetTime()) / 3);
-		offset[1] = (sin(glfwGetTime()) / 4);
-		offset[2] = (sin(glfwGetTime()) / 5);
-		offsetLocation = glGetUniformLocation(shader->GetProgram(), "offset");
-		glUniform3fv(offsetLocation, 1, offset);
+		// textures
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, TBO[0]);
+		glUniform1i(glGetUniformLocation(shader->GetProgram(), "wallTexture"), 1);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, TBO[1]);
+		glUniform1i(glGetUniformLocation(shader->GetProgram(), "lenaTexture"), 0);
+
+		// transformations
+		glm::mat4 transform;
+		transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f));
+		transform = glm::rotate(transform, static_cast<GLfloat>(glfwGetTime()), glm::vec3(0.0f, 0.0f, 1.0f));
+		transformLocation = glGetUniformLocation(shader->GetProgram(), "transform");
+		glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(transform));
 
 		if (isIndexedDraw) {
 			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
@@ -116,6 +173,7 @@ void render(void)
 		}
 
 		glBindVertexArray(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
