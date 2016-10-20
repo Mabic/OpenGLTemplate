@@ -18,7 +18,7 @@ Shader::Shader(const std::string& vertexShaderPath, const std::string& fragmentS
 	glLinkProgram(m_program);
 
 	GLint isLinked = 0;
-	glGetProgramiv(m_program, GL_COMPILE_STATUS, &isLinked);
+	glGetProgramiv(m_program, GL_LINK_STATUS, &isLinked);
 
 	if (isLinked == GL_FALSE)
 	{
