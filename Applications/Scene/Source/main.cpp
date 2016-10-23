@@ -6,9 +6,10 @@
 #include <GLFW/glfw3.h> // GLFW helper library
 #include <memory>
 #include <stdio.h>
-#include <SOIL.h>
 
+#include "Mesh.hpp"
 #include "Camera.hpp"
+#include "Texture.hpp"
 #include "Shader.h"
 
 const std::string pathToShaders("C:\\Users\\mariu\\OneDrive\\Dokumenty\\Visual Studio 2015\\Projects\\OpenGLTemplate\\Applications\\Scene\\Resources\\Shaders\\");
@@ -21,12 +22,6 @@ GLuint VBO{ 0 };
 GLuint EBO{ 0 };
 GLuint TBO{ 0 };
 
-// Textures
-struct Texture {
-	unsigned char* image;
-	int width, height;
-} texture;
-
 std::unique_ptr<Shader> shader;
 
 GLFWwindow* window = nullptr;
@@ -36,43 +31,14 @@ glm::vec3 positions[]{
 	{0.0f, -0.5f, -4.0f}  // 2
 };
 
-GLfloat cube[] {         // TexCoord
-	 0.5f, -0.5f,  0.5f, 1.0f, 0.0f, // 0 
-	-0.5f, -0.5f,  0.5f, 0.0f, 0.0f, // 1
-	-0.5f,  0.5f,  0.5f, 0.0f, 1.0f, // 2
-	 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, // 3
-	 0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // 4
-	-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, // 5
-	-0.5f,  0.5f, -0.5f, 1.0f, 1.0f, // 6
-	 0.5f,  0.5f, -0.5f, 0.0f, 1.0f, // 7
-};
-
-GLuint cubeIndices[]{
-	// front
-	0, 1, 2,
-	0, 2, 3,
-	// left
-	1, 5, 6,
-	1, 6, 2,
-	// right
-	0, 3, 7,
-	0, 7, 4,
-	// back
-	4, 6, 5,
-	4, 7, 6,
-	// up
-	3, 2, 6,
-	3, 6, 7,
-	// down
-	1, 0, 5,
-	0, 5, 4,
-};
-
 // Camera variables
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 GLfloat lastX = 0.0f;
 GLfloat lastY = 0.0f;
 bool firstMouse = true;
+
+// Mesh
+std::vector<Mesh> meshes;
 
 void mouse_callback(GLFWwindow* window, double positionX, double positionY)
 {
@@ -89,6 +55,48 @@ void mouse_callback(GLFWwindow* window, double positionX, double positionY)
 	lastY = static_cast<GLfloat>(positionY);
 
 	camera.UpdateEulerAngles(xoffset, yoffset);
+}
+
+// generating simple cube mesh
+void createCube()
+{
+	std::vector<Vertex> cube {              // TexCoord
+		Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 0.0f)),   // 0 
+		Vertex(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f)), // 1
+		Vertex(glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec2(0.0f, 1.0f)), // 2
+		Vertex(glm::vec3(0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 1.0f)),  // 3
+		Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f)),  // 4
+		Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 0.0f)), // 5
+		Vertex(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec2(1.0f, 1.0f)), // 6
+		Vertex(glm::vec3(0.5f,  0.5f, -0.5f), glm::vec2(0.0f, 1.0f))   // 7
+	};
+
+	std::vector<unsigned int> cubeIndices {
+		// front
+		0, 1, 2,
+		0, 2, 3,
+		// left
+		1, 5, 6,
+		1, 6, 2,
+		// right
+		0, 3, 7,
+		0, 7, 4,
+		// back
+		4, 6, 5,
+		4, 7, 6,
+		// up
+		3, 2, 6,
+		3, 6, 7,
+		// down
+		1, 0, 5,
+		0, 5, 4,
+	};
+
+	// Load Texture
+	std::vector<Texture> cubeTextures;
+	cubeTextures.push_back(std::move(Texture(pathToTexture + "texture.jpg")));
+
+	meshes.push_back(Mesh(std::move(cube), std::move(cubeTextures), std::move(cubeIndices)));
 }
 
 static void init(void)
@@ -126,6 +134,9 @@ static void init(void)
 
 	shader.reset(new Shader(pathToShaders + "vertex.vert", pathToShaders + "fragment.frag"));
 
+	createCube();
+	const Mesh& cube = meshes.front();
+
 	// Vertex Array Object
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
@@ -133,30 +144,25 @@ static void init(void)
 	// Vertex Buffer Object for Cube
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cube), &cube, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, cube.GetVertices().size() * sizeof(Vertex), &cube.GetVertices().front(), GL_STATIC_DRAW);
 
 	// Element Buffer Object for Cube
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), &cubeIndices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube.GetIndices().size() * sizeof(unsigned int), &cube.GetIndices().front(), GL_STATIC_DRAW);
 
 	// Set current VAO
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 5, (GLvoid*) 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 8, (GLvoid*) 0);
 	glEnableVertexAttribArray(0);
 
-	// Load Texture
-	std::string path(pathToTexture + "texture.jpg");
-	texture.image = SOIL_load_image(path.c_str(), &texture.width, &texture.height, 0, SOIL_LOAD_RGB);
-
+	// Texture
 	glGenTextures(1, &TBO);
 	glBindTexture(GL_TEXTURE_2D, TBO);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture.width, texture.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.image);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, cube.GetTextures().at(0).GetWidth(), cube.GetTextures().at(0).GetHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, cube.GetTextures().at(0).GetTextureData());
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 5, (GLvoid*)(sizeof(GL_FLOAT) * 3));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 8, (GLvoid*)(sizeof(GL_FLOAT) * 6));
 	glEnableVertexAttribArray(1);
-
-	SOIL_free_image_data(texture.image);
 
 	// Unbind current VAO
 	glBindVertexArray(0);
@@ -165,7 +171,7 @@ static void init(void)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void uninitialize(void) 
+static void uninitialize(void) 
 {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
@@ -174,7 +180,7 @@ void uninitialize(void)
 	glfwTerminate();
 }
 
-void render(void)
+static void render(void)
 {
 	GLfloat angle = 0.0f;
 	while (!glfwWindowShouldClose(window))
@@ -189,8 +195,7 @@ void render(void)
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TBO);
 		glUniform1i(glGetUniformLocation(shader->GetProgram(), "textureSampler"), 0);
-
-		
+	
 		// transformations
 		glm::mat4 modelMatrix;
 		angle -= 0.05f;
