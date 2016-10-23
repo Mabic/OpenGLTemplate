@@ -8,7 +8,7 @@ SET( HEADERS
 
 # list of sources
 SET( SOURCES
-	 ${SOURCE_DIRECTORY}/main.cpp
+     ${SOURCE_DIRECTORY}/main.cpp
 )
 
 INCLUDE_DIRECTORIES( Include )

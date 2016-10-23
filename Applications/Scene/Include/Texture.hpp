@@ -5,21 +5,21 @@
 
 class Texture {
 public:
-	Texture() = delete;
-	Texture(const Texture&) = delete;
-	Texture(Texture&&);
-	Texture(const std::string& texturePath);
-	~Texture();
+    Texture() = delete;
+    Texture(const Texture&) = delete;
+    Texture(Texture&&);
+    Texture(const std::string& texturePath);
+    ~Texture();
 
-	Texture operator=(const Texture&) = delete;
+    Texture operator=(const Texture&) = delete;
 
-	inline const unsigned char* const GetTextureData() const { return m_data; }
-	inline int GetWidth() const { return m_width; }
-	inline int GetHeight() const { return m_height; }
+    inline const unsigned char* const GetTextureData() const { return m_data; }
+    inline int GetWidth() const { return m_width; }
+    inline int GetHeight() const { return m_height; }
 private:
-	unsigned char *m_data;
-	int m_width;
-	int m_height;
+    unsigned char *m_data;
+    int m_width;
+    int m_height;
 };
 
 #endif // !MESH_HPP

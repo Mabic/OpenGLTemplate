@@ -5,16 +5,16 @@ SET( SOURCE_DIRECTORY Source)
 # list of headers
 SET( HEADERS
      ${HEADER_DIRECTORY}/Camera.hpp
-	 ${HEADER_DIRECTORY}/Texture.hpp
+     ${HEADER_DIRECTORY}/Texture.hpp
      ${HEADER_DIRECTORY}/Mesh.hpp
 )
 
 # list of sources
 SET( SOURCES
-	 ${SOURCE_DIRECTORY}/main.cpp
-	 ${SOURCE_DIRECTORY}/Camera.cpp
-	 ${SOURCE_DIRECTORY}/Texture.cpp
-	 ${SOURCE_DIRECTORY}/Mesh.cpp
+     ${SOURCE_DIRECTORY}/main.cpp
+     ${SOURCE_DIRECTORY}/Camera.cpp
+     ${SOURCE_DIRECTORY}/Texture.cpp
+     ${SOURCE_DIRECTORY}/Mesh.cpp
 )
 
 INCLUDE_DIRECTORIES( Include )
