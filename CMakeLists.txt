@@ -6,10 +6,12 @@ IF (WIN32)
     INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/GLM )
     INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/GLFW/include )
     INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/SOIL/include )
+	INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/assimp-3.3.1/include )
 
     LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/GLEW/lib/Release/x64 )
     LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/GLFW/lib-vc2015 )
     LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/SOIL/lib )
+	LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/assimp-3.3.1/build/code/Debug )
 ENDIF (WIN32)
 
 INCLUDE( Libraries/CMakeLists.txt )
