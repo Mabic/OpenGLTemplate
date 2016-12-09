@@ -8,7 +8,8 @@ Camera::Camera(glm::vec3 && position, glm::vec3 && front, glm::vec3 && up)
       m_up(std::move(up)),
       m_yaw(-90.0f),
       m_pitch(0.0f),
-      m_sensitivity(0.02f)
+      m_sensitivity(0.1f),
+	  m_speed(0.1f)
 {}
 
 Camera::~Camera()
@@ -36,4 +37,23 @@ void Camera::UpdateEulerAngles(float offsetX, float offsetY)
     front.y = sin(glm::radians(m_pitch));
     front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
     m_front = glm::normalize(front);
+}
+
+void Camera::UpdatePosition(Camera::DIRECTION direction) {
+	switch (direction) {
+	case DIRECTION::FORWARD :
+		m_position += m_front * m_speed;
+		break;
+	case DIRECTION::BACKWARD :
+		m_position -= m_front * m_speed;
+		break;
+	case DIRECTION::RIGHT :
+		m_position += glm::normalize(glm::cross(m_front, m_up)) * m_speed;
+		break;
+	case DIRECTION::LEFT :
+		m_position -= glm::normalize(glm::cross(m_front, m_up)) * m_speed;
+		break;
+	default:
+		assert("Undefined direction!");
+	}
 }

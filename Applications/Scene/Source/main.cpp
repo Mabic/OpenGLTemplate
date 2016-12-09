@@ -35,6 +35,7 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 GLfloat lastX = 0.0f;
 GLfloat lastY = 0.0f;
 bool firstMouse = true;
+bool keys[1024];
 
 // TweakBar
 TwBar* bar;
@@ -42,6 +43,14 @@ std::vector<short> activeMeshes;
 
 void mouse_callback(GLFWwindow* window, double positionX, double positionY)
 {
+	TwEventCursorPosGLFW3(window, positionX, positionY + 30.0);
+
+	int cursorMode = glfwGetInputMode(window, GLFW_CURSOR);
+
+	if (cursorMode != GLFW_CURSOR_DISABLED) {
+		return;
+	}
+
     if (firstMouse)
     {
         lastX = static_cast<GLfloat>(positionX);
@@ -55,12 +64,15 @@ void mouse_callback(GLFWwindow* window, double positionX, double positionY)
     lastY = static_cast<GLfloat>(positionY);
 
     camera.UpdateEulerAngles(xoffset, yoffset);
-
-	TwEventCursorPosGLFW3(window, positionX, positionY + 30.0);
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	if (action == GLFW_PRESS)
+		keys[key] = true;
+	else if (action == GLFW_RELEASE)
+		keys[key] = false;
+
 	if (key == GLFW_KEY_F && action == GLFW_PRESS) {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
@@ -70,6 +82,25 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 	TwEventKeyGLFW3(window, key, scancode, action, mods);
+}
+
+void cameraMovement()
+{
+	if (keys[GLFW_KEY_W]) {
+		camera.UpdatePosition(Camera::DIRECTION::FORWARD);
+	}
+
+	if (keys[GLFW_KEY_S]) {
+		camera.UpdatePosition(Camera::DIRECTION::BACKWARD);
+	}
+
+	if (keys[GLFW_KEY_A]) {
+		camera.UpdatePosition(Camera::DIRECTION::LEFT);
+	}
+
+	if (keys[GLFW_KEY_D]) {
+		camera.UpdatePosition(Camera::DIRECTION::RIGHT);
+	}
 }
 
 static void init(void)
@@ -196,6 +227,8 @@ static void render(void)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader->UseProgram();
+		glfwPollEvents();
+		cameraMovement();
         
 		for (unsigned int meshID = 0; meshID < VAO.size(); ++meshID) {
 

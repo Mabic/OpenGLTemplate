@@ -6,6 +6,11 @@
 class Camera
 {
 public:
+
+	enum class DIRECTION : short {
+		FORWARD = 0, BACKWARD = 1, RIGHT = 2, LEFT = 3
+	};
+
     Camera(glm::vec3 && position = glm::vec3(0.0f,0.0f,0.0f), 
            glm::vec3 && front = glm::vec3(0.0f, 0.0f, -1.0f), 
            glm::vec3 && up = glm::vec3(0.0f, 1.0f, 0.0f));
@@ -13,6 +18,7 @@ public:
 
     glm::mat4 GetViewMatrix() const;
     void UpdateEulerAngles(float offsetX, float offsetY);
+	void UpdatePosition(DIRECTION direction);
 
 private:
     glm::vec3 m_position;
@@ -23,6 +29,7 @@ private:
     float m_yaw;
 
     float m_sensitivity;
+	float m_speed;
 };
 
 #endif // !CAMERA_HPP
