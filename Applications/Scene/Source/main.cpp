@@ -150,7 +150,7 @@ static void init(void)
 	EBO.resize(meshesSize);
 	TBO.resize(meshesSize);
 	indicesSize.resize(meshesSize);
-	activeMeshes.resize(meshesSize);
+	activeMeshes.resize(meshesSize, 1);
 
 	for (unsigned int meshID = 0; meshID < meshesSize; ++meshID) {
 
