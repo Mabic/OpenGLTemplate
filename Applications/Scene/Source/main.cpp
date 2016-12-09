@@ -2,8 +2,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <GL/glew.h>    // include GLEW and new version of GL on Windows
-#include <GLFW/glfw3.h> // GLFW helper library
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <AntTweakBar.h>
 #include <memory>
 #include <stdio.h>
 
@@ -35,6 +36,10 @@ GLfloat lastX = 0.0f;
 GLfloat lastY = 0.0f;
 bool firstMouse = true;
 
+// TweakBar
+TwBar* bar;
+std::vector<short> activeMeshes;
+
 void mouse_callback(GLFWwindow* window, double positionX, double positionY)
 {
     if (firstMouse)
@@ -50,6 +55,21 @@ void mouse_callback(GLFWwindow* window, double positionX, double positionY)
     lastY = static_cast<GLfloat>(positionY);
 
     camera.UpdateEulerAngles(xoffset, yoffset);
+
+	TwEventCursorPosGLFW3(window, positionX, positionY + 30.0);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+
+	TwEventKeyGLFW3(window, key, scancode, action, mods);
 }
 
 static void init(void)
@@ -76,7 +96,9 @@ static void init(void)
 
     glfwMakeContextCurrent(window);
     glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetKeyCallback(window, key_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
     // start GLEW extension handler
     glewExperimental = GL_TRUE;
@@ -97,6 +119,7 @@ static void init(void)
 	EBO.resize(meshesSize);
 	TBO.resize(meshesSize);
 	indicesSize.resize(meshesSize);
+	activeMeshes.resize(meshesSize);
 
 	for (unsigned int meshID = 0; meshID < meshesSize; ++meshID) {
 
@@ -131,6 +154,21 @@ static void init(void)
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 8, (GLvoid*)(sizeof(GL_FLOAT) * 6));
 		glEnableVertexAttribArray(1);
 	}
+
+	// AntTweakBar
+	TwInit(TW_OPENGL_CORE, NULL);
+	TwWindowSize(1024, 768);
+
+	TwBar* bar = TwNewBar("Meshes");
+	TwDefine("Meshes size='240 320'");
+	TwDefine("Meshes position='50 50'");
+	for (unsigned int meshID = 0; meshID < activeMeshes.size(); ++meshID) {
+		std::string name = std::to_string(meshID);
+		TwAddVarRW(bar, name.c_str(), TW_TYPE_BOOLCPP, &activeMeshes[meshID], "");
+	}
+	glfwSetMouseButtonCallback(window, (GLFWmousebuttonfun)TwEventMouseButtonGLFW3);
+	glfwSetCharCallback(window, (GLFWcharfun)TwEventCharGLFW);
+
     // Unbind current VAO
     glBindVertexArray(0);
 
@@ -145,7 +183,7 @@ static void uninitialize(void)
 		glDeleteBuffers(1, &VBO[meshID]);
 		glDeleteBuffers(1, &EBO[meshID]);
 	}
-
+	TwTerminate();
     glfwTerminate();
 }
 
@@ -160,6 +198,11 @@ static void render(void)
         shader->UseProgram();
         
 		for (unsigned int meshID = 0; meshID < VAO.size(); ++meshID) {
+
+			if (activeMeshes[meshID] == 0) {
+				continue;
+			}
+
 			glBindVertexArray(VAO[meshID]);
 
 			// textures
@@ -186,6 +229,8 @@ static void render(void)
 		}
 
         glBindVertexArray(0);
+
+		TwDraw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

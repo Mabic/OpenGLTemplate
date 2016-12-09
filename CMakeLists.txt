@@ -7,11 +7,13 @@ IF (WIN32)
     INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/GLFW/include )
     INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/SOIL/include )
 	INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/assimp-3.3.1/include )
+	INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/AntTweakBar/include )
 
     LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/GLEW/lib/Release/x64 )
     LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/GLFW/lib-vc2015 )
     LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/SOIL/lib )
 	LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/assimp-3.3.1/build/code/Debug )
+	LINK_DIRECTORIES( ${CMAKE_SOURCE_DIR}/External/windows/AntTweakBar/lib/debug )
 ENDIF (WIN32)
 
 INCLUDE( Libraries/CMakeLists.txt )

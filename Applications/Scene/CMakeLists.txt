@@ -24,5 +24,5 @@ INCLUDE_DIRECTORIES( ${SHADER_LOADER_HEADERS} )
 
 ADD_EXECUTABLE(scene  ${HEADERS} ${SOURCES})
 
-TARGET_LINK_LIBRARIES (scene assimp-vc140-mt SOIL glfw3 glew32s glu32 opengl32 ShaderLoader)
+TARGET_LINK_LIBRARIES (scene AntTweakBar assimp-vc140-mt SOIL glfw3 glew32s glu32 opengl32 ShaderLoader)
 
