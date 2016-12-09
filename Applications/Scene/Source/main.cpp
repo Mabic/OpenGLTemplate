@@ -141,7 +141,7 @@ static void init(void)
     shader.reset(new Shader(pathToShaders + "vertex.vert", pathToShaders + "fragment.frag"));
 
 	// Load Model
-	ModelLoader modelLoader{ pathToModel + "sponza.obj" };
+	ModelLoader modelLoader{ pathToModel + "lost_empire/lost_empire.obj" };
 
     const auto& meshes = modelLoader.GetMeshes();
 	auto meshesSize = meshes.size();
