@@ -13,6 +13,7 @@ public:
 	~Object();
 
 	void Render(const Shader&);
+	bool& IsMeshRenderable() { return m_isMeshRenderable; }
 
 private:
 
@@ -26,6 +27,7 @@ private:
 
 	size_t m_indicesSize;
 	bool m_isTextureExist;
+	bool m_isMeshRenderable;
 };
 
 #endif // !OBJECT_HPP

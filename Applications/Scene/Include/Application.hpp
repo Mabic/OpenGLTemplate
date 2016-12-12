@@ -43,7 +43,6 @@ private:
 
 	// meshes
 	std::vector<Object> m_objects;
-	std::vector<short> m_activeMeshes;
 
 	// TweakBar
 	TwBar* m_TweakBar;

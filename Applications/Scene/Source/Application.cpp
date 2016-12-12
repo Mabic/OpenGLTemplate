@@ -85,7 +85,6 @@ void Application::Initialize()
 
 	const auto& meshes = modelLoader.GetMeshes();
 	auto meshesSize = meshes.size();
-	m_activeMeshes.resize(meshesSize, 1);
 
 	for (unsigned int meshID = 0; meshID < meshesSize; ++meshID) {
 		m_objects.push_back(Object(meshes[meshID]));
@@ -108,7 +107,7 @@ void Application::Render()
 
 		for (unsigned int meshID = 0; meshID < m_objects.size(); ++meshID) {
 
-			if (m_activeMeshes[meshID] == 0) {
+			if (!m_objects[meshID].IsMeshRenderable()) {
 				continue;
 			}
 
@@ -226,9 +225,9 @@ void Application::InitializeAntTweakBar()
 	m_TweakBar = TwNewBar("Meshes");
 	TwDefine("Meshes size='240 320'");
 	TwDefine("Meshes position='50 50'");
-	for (unsigned int meshID = 0; meshID < m_activeMeshes.size(); ++meshID) {
+	for (unsigned int meshID = 0; meshID < m_objects.size(); ++meshID) {
 		std::string name = std::to_string(meshID);
-		TwAddVarRW(m_TweakBar, name.c_str(), TW_TYPE_BOOLCPP, &m_activeMeshes[meshID], "");
+		TwAddVarRW(m_TweakBar, name.c_str(), TW_TYPE_BOOLCPP, &m_objects[meshID].IsMeshRenderable(), "");
 	}
 	glfwSetMouseButtonCallback(m_window, (GLFWmousebuttonfun)TwEventMouseButtonGLFW3);
 	glfwSetCharCallback(m_window, (GLFWcharfun)TwEventCharGLFW);

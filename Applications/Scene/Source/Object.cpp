@@ -6,7 +6,8 @@
 #include "Shader.h"
 
 Object::Object(const Mesh& mesh)
-	: m_isTextureExist(!mesh.GetTextures().empty())
+	: m_isTextureExist(!mesh.GetTextures().empty()),
+	  m_isMeshRenderable(true)
 {
 	InitializeBuffers(mesh);
 }
@@ -19,6 +20,7 @@ Object::Object(Object&& object)
 	m_textureBufferObject = object.m_textureBufferObject;
 	m_indicesSize = object.m_indicesSize;
 	m_isTextureExist = object.m_isTextureExist;
+	m_isMeshRenderable = object.m_isMeshRenderable;
 
 	object.m_vertexArrayObject = 0;
 	object.m_vertexBufferObject = 0;
@@ -26,6 +28,7 @@ Object::Object(Object&& object)
 	object.m_textureBufferObject = 0;
 	object.m_indicesSize = 0;
 	object.m_isTextureExist = 0;
+	object.m_isMeshRenderable = 0;
 }
 
 Object::~Object()
