@@ -6,7 +6,7 @@
 
 ModelLoader::ModelLoader(const std::string& pathToFile)
 {
-	m_directory = pathToFile.substr(0, pathToFile.find_last_of("\\"));
+	m_directory = GetCurrentDirectory(pathToFile);
 
 	Assimp::Importer importer;
 
@@ -75,6 +75,11 @@ void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene)
 	for (unsigned int childID = 0; childID < node->mNumChildren; ++childID) {
 		ProcessNode(node->mChildren[childID], scene);
 	}
+}
+
+std::string ModelLoader::GetCurrentDirectory(const std::string& path) const
+{
+	return path.substr(0, path.find_last_of("\\"));
 }
 
 ModelLoader::~ModelLoader()
