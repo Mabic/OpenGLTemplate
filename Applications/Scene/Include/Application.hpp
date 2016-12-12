@@ -9,6 +9,7 @@
 #include "Camera.hpp"
 
 struct GLFWwindow;
+class Object;
 class Shader;
 
 class Application
@@ -40,15 +41,9 @@ private:
 	// shaders
 	std::unique_ptr<Shader> m_shader;
 
-	// buffer objects
-	std::vector<unsigned int> m_vertexArrayObject;
-	std::vector<unsigned int> m_vertexBufferObject;
-	std::vector<unsigned int> m_elementBufferObject;
-	std::vector<unsigned int> m_textureBufferObject;
-	
 	// meshes
+	std::vector<Object> m_objects;
 	std::vector<short> m_activeMeshes;
-	std::vector<size_t> m_indicesSize;
 
 	// TweakBar
 	TwBar* m_TweakBar;

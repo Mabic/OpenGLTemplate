@@ -10,6 +10,7 @@
 
 #include "Application.hpp"
 #include "ModelLoader.hpp"
+#include "Object.hpp"
 #include "Shader.h"
 
 namespace {
@@ -84,54 +85,13 @@ void Application::Initialize()
 
 	const auto& meshes = modelLoader.GetMeshes();
 	auto meshesSize = meshes.size();
-	m_vertexArrayObject.resize(meshesSize);
-	m_vertexBufferObject.resize(meshesSize);
-	m_elementBufferObject.resize(meshesSize);
-	m_textureBufferObject.resize(meshesSize);
-	m_indicesSize.resize(meshesSize);
 	m_activeMeshes.resize(meshesSize, 1);
 
 	for (unsigned int meshID = 0; meshID < meshesSize; ++meshID) {
-
-		m_indicesSize[meshID] = meshes[meshID].GetIndices().size();
-
-		// Vertex Array Object
-		glGenVertexArrays(1, &m_vertexArrayObject[meshID]);
-		glBindVertexArray(m_vertexArrayObject[meshID]);
-
-		// Vertex Buffer Object for Cube
-		glGenBuffers(1, &m_vertexBufferObject[meshID]);
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferObject[meshID]);
-		glBufferData(GL_ARRAY_BUFFER, meshes[meshID].GetVertices().size() * sizeof(Vertex), &meshes[meshID].GetVertices().front(), GL_STATIC_DRAW);
-
-		// Element Buffer Object for Cube
-		glGenBuffers(1, &m_elementBufferObject[meshID]);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementBufferObject[meshID]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, meshes[meshID].GetIndices().size() * sizeof(unsigned int), &meshes[meshID].GetIndices().front(), GL_STATIC_DRAW);
-
-		// Set current VAO
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 8, (GLvoid*)0);
-		glEnableVertexAttribArray(0);
-
-		// Texture
-		if (!meshes[meshID].GetTextures().empty()) {
-			glGenTextures(1, &m_textureBufferObject[meshID]);
-			glBindTexture(GL_TEXTURE_2D, m_textureBufferObject[meshID]);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, meshes[meshID].GetTextures().at(0).GetWidth(), meshes[meshID].GetTextures().at(0).GetHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, meshes[meshID].GetTextures().at(0).GetTextureData());
-			glGenerateMipmap(GL_TEXTURE_2D);
-		}
-
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 8, (GLvoid*)(sizeof(GL_FLOAT) * 6));
-		glEnableVertexAttribArray(1);
+		m_objects.push_back(Object(meshes[meshID]));
 	}
 
 	InitializeAntTweakBar();
-
-	// Unbind current VAO
-	glBindVertexArray(0);
-
-	// Unbind current texture
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Application::Render()
@@ -146,18 +106,11 @@ void Application::Render()
 		glfwPollEvents();
 		CameraMovement();
 
-		for (unsigned int meshID = 0; meshID < m_vertexArrayObject.size(); ++meshID) {
+		for (unsigned int meshID = 0; meshID < m_objects.size(); ++meshID) {
 
 			if (m_activeMeshes[meshID] == 0) {
 				continue;
 			}
-
-			glBindVertexArray(m_vertexArrayObject[meshID]);
-
-			// textures
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, m_textureBufferObject[meshID]);
-			glUniform1i(glGetUniformLocation(m_shader->GetProgram(), "textureSampler"), 0);
 
 			// transformations
 			glm::mat4 modelMatrix;
@@ -174,10 +127,8 @@ void Application::Render()
 			glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 			glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
-			glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indicesSize[meshID]), GL_UNSIGNED_INT, 0);
+			m_objects[meshID].Render(*m_shader);
 		}
-
-		glBindVertexArray(0);
 
 		TwDraw();
 
@@ -188,11 +139,6 @@ void Application::Render()
 
 void Application::CleanUp()
 {
-	for (unsigned int meshID = 0; meshID < m_vertexArrayObject.size(); ++meshID) {
-		glDeleteVertexArrays(1, &m_vertexArrayObject[meshID]);
-		glDeleteBuffers(1, &m_vertexBufferObject[meshID]);
-		glDeleteBuffers(1, &m_elementBufferObject[meshID]);
-	}
 	TwTerminate();
 	glfwTerminate();
 }
