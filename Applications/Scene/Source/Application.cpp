@@ -84,10 +84,9 @@ void Application::Initialize()
 	ModelLoader modelLoader (pathToModel + "lost_empire\\lost_empire.obj");
 
 	const auto& meshes = modelLoader.GetMeshes();
-	auto meshesSize = meshes.size();
 
-	for (unsigned int meshID = 0; meshID < meshesSize; ++meshID) {
-		m_objects.push_back(Object(meshes[meshID]));
+	for (const Mesh& mesh : meshes) {
+		m_objects.push_back(Object(mesh));
 	}
 
 	InitializeAntTweakBar();
@@ -105,9 +104,9 @@ void Application::Render()
 		glfwPollEvents();
 		CameraMovement();
 
-		for (unsigned int meshID = 0; meshID < m_objects.size(); ++meshID) {
+		for (Object& object : m_objects) {
 
-			if (!m_objects[meshID].IsMeshRenderable()) {
+			if (!object.IsMeshRenderable()) {
 				continue;
 			}
 
@@ -126,7 +125,7 @@ void Application::Render()
 			glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 			glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
-			m_objects[meshID].Render(*m_shader);
+			object.Render(*m_shader);
 		}
 
 		TwDraw();
