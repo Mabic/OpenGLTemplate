@@ -125,19 +125,7 @@ void Application::Initialize()
 		glEnableVertexAttribArray(1);
 	}
 
-	// AntTweakBar
-	TwInit(TW_OPENGL_CORE, NULL);
-	TwWindowSize(1024, 768);
-
-	m_TweakBar = TwNewBar("Meshes");
-	TwDefine("Meshes size='240 320'");
-	TwDefine("Meshes position='50 50'");
-	for (unsigned int meshID = 0; meshID < m_activeMeshes.size(); ++meshID) {
-		std::string name = std::to_string(meshID);
-		TwAddVarRW(m_TweakBar, name.c_str(), TW_TYPE_BOOLCPP, &m_activeMeshes[meshID], "");
-	}
-	glfwSetMouseButtonCallback(m_window, (GLFWmousebuttonfun)TwEventMouseButtonGLFW3);
-	glfwSetCharCallback(m_window, (GLFWcharfun)TwEventCharGLFW);
+	InitializeAntTweakBar();
 
 	// Unbind current VAO
 	glBindVertexArray(0);
@@ -282,4 +270,20 @@ void Application::CameraMovement()
 	if (m_pressedKey[GLFW_KEY_D]) {
 		m_camera.UpdatePosition(Camera::DIRECTION::RIGHT);
 	}
+}
+
+void Application::InitializeAntTweakBar()
+{
+	TwInit(TW_OPENGL_CORE, NULL);
+	TwWindowSize(m_windowWidth, m_windowHeight);
+
+	m_TweakBar = TwNewBar("Meshes");
+	TwDefine("Meshes size='240 320'");
+	TwDefine("Meshes position='50 50'");
+	for (unsigned int meshID = 0; meshID < m_activeMeshes.size(); ++meshID) {
+		std::string name = std::to_string(meshID);
+		TwAddVarRW(m_TweakBar, name.c_str(), TW_TYPE_BOOLCPP, &m_activeMeshes[meshID], "");
+	}
+	glfwSetMouseButtonCallback(m_window, (GLFWmousebuttonfun)TwEventMouseButtonGLFW3);
+	glfwSetCharCallback(m_window, (GLFWcharfun)TwEventCharGLFW);
 }

@@ -30,6 +30,8 @@ private:
 	void KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	void CameraMovement();
 
+	void InitializeAntTweakBar();
+
 	// window definitions
 	GLFWwindow* m_window;
 	int m_windowWidth;

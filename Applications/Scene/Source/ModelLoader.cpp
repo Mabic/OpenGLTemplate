@@ -61,7 +61,7 @@ void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene)
 		if (mesh->mMaterialIndex >= 0) {
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-			for (int i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); i++)
+			for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); i++)
 			{
 				aiString str;
 				material->GetTexture(aiTextureType_DIFFUSE, i, &str);
