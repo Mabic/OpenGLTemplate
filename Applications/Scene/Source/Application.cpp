@@ -12,6 +12,7 @@
 #include "ModelLoader.hpp"
 #include "Object.hpp"
 #include "Shader.h"
+#include "TransformationMaterialUBO.hpp"
 
 namespace {
 	const std::string pathToShaders("C:\\Users\\mariu\\OneDrive\\Dokumenty\\Visual Studio 2015\\Projects\\OpenGLTemplate\\Applications\\Scene\\Resources\\Shaders\\");
@@ -81,9 +82,13 @@ void Application::Initialize()
 
 	m_shader.reset(new Shader(pathToShaders + "vertex.vert", pathToShaders + "fragment.frag"));
 
+	m_uniformBuffer.reset(new TransformationMaterialBuffer(m_shader.get()));
+
 	ModelLoader modelLoader (pathToModel + "teapot\\teapot.obj");
 
 	const auto& meshes = modelLoader.GetMeshes();
+
+	m_uniformBuffer->UpdateMaterial(meshes.back().GetMaterial());
 
 	for (const Mesh& mesh : meshes) {
 		m_objects.push_back(Object(mesh));

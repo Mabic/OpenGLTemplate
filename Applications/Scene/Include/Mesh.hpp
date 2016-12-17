@@ -66,7 +66,7 @@ public:
     inline const std::vector<Vertex>& GetVertices() const { return m_vertices; }
     inline const std::vector<Texture>& GetTextures() const { return m_textures; }
     inline const std::vector<unsigned int>& GetIndices() const { return m_indices; }
-	inline const
+	inline const Material& GetMaterial() const { return m_material; }
 
 private:
     std::vector<Vertex> m_vertices;

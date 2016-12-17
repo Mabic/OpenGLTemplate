@@ -11,6 +11,7 @@
 struct GLFWwindow;
 class Object;
 class Shader;
+class TransformationMaterialBuffer;
 
 class Application
 {
@@ -40,6 +41,9 @@ private:
 
 	// shaders
 	std::unique_ptr<Shader> m_shader;
+
+	// uniforms
+	std::unique_ptr<TransformationMaterialBuffer> m_uniformBuffer;
 
 	// meshes
 	std::vector<Object> m_objects;
