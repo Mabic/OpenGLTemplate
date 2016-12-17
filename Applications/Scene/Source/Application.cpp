@@ -81,7 +81,7 @@ void Application::Initialize()
 
 	m_shader.reset(new Shader(pathToShaders + "vertex.vert", pathToShaders + "fragment.frag"));
 
-	ModelLoader modelLoader (pathToModel + "lost_empire\\lost_empire.obj");
+	ModelLoader modelLoader (pathToModel + "teapot\\teapot.obj");
 
 	const auto& meshes = modelLoader.GetMeshes();
 

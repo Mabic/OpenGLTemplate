@@ -58,18 +58,22 @@ void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene)
 		}
 
 		std::vector<Texture> textures;
+		Material material;
 		if (mesh->mMaterialIndex >= 0) {
-			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+			aiMaterial* materialNode = scene->mMaterials[mesh->mMaterialIndex];
 
-			for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); i++)
+			material = GetMaterial(materialNode);
+
+			for (unsigned int i = 0; i < materialNode->GetTextureCount(aiTextureType_DIFFUSE); i++)
 			{
 				aiString str;
-				material->GetTexture(aiTextureType_DIFFUSE, i, &str);
+				materialNode->GetTexture(aiTextureType_DIFFUSE, i, &str);
 				textures.push_back(Texture(m_directory + "\\" + str.C_Str()));
 			}
 		}
 
-		m_meshes.push_back(Mesh(std::move(vertices), std::move(textures), std::move(indices)));
+		m_meshes.push_back(Mesh(std::move(vertices), std::move(textures),
+			                    std::move(indices), std::move(material)));
 	}
 
 	for (unsigned int childID = 0; childID < node->mNumChildren; ++childID) {
@@ -80,6 +84,33 @@ void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene)
 std::string ModelLoader::GetCurrentDirectory(const std::string& path) const
 {
 	return path.substr(0, path.find_last_of("\\"));
+}
+
+Material ModelLoader::GetMaterial(const aiMaterial* materialNode) const
+{
+	Material material;
+
+	aiColor3D color(0.f);
+	materialNode->Get(AI_MATKEY_COLOR_AMBIENT, color);
+	material.m_ambient.r = color.r;
+	material.m_ambient.g = color.g;
+	material.m_ambient.b = color.b;
+
+	materialNode->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+	material.m_diffuse.r = color.r;
+	material.m_diffuse.g = color.g;
+	material.m_diffuse.b = color.b;
+
+	materialNode->Get(AI_MATKEY_COLOR_SPECULAR, color);
+	material.m_specular.r = color.r;
+	material.m_specular.g = color.g;
+	material.m_specular.b = color.b;
+
+	float shinines = 0.0f;
+	materialNode->Get(AI_MATKEY_SHININESS, shinines);
+	material.m_shinines = shinines;
+
+	return material;
 }
 
 ModelLoader::~ModelLoader()

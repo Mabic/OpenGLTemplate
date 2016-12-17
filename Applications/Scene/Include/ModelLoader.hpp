@@ -23,6 +23,7 @@ public:
 private:
 	void ProcessNode(const aiNode* node, const aiScene* scene);
 	std::string GetCurrentDirectory(const std::string& path) const;
+	Material GetMaterial(const aiMaterial* material) const;
 
 	std::vector<Mesh> m_meshes;
 	std::string m_directory;
