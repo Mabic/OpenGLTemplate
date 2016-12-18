@@ -4,26 +4,37 @@
 #include <glm\glm.hpp>
 #include "Mesh.hpp"
 
+struct LightData {
+
+	LightData() = default;
+
+	LightData(glm::vec4 position, glm::vec4 color) 
+		: m_position(position),
+		  m_color(color)
+	{}
+
+	glm::vec4 m_position;
+	glm::vec4 m_color;
+};
+
 class Light
 {
 public:
 
-	Light(glm::vec4 position, glm::vec3 color);
-	Light(glm::vec4 position, glm::vec3 color, const Mesh& mesh);
+	Light(const LightData& data);
+	Light(const LightData& data, const Mesh& mesh);
 	Light(const Light&) = delete;
 	Light(Light&&);
 	~Light();
 
 	void Render();
-	inline glm::vec4 GetPosition() const { return m_position; }
-	inline glm::vec3 GetColor() const { return m_color; }
+	inline const LightData& GetData() const { return m_data; }
 
 private:
 	void InitializeBuffers(const Mesh&);
 	void CleanUp();
 
-	glm::vec4 m_position;
-	glm::vec3 m_color;
+	LightData m_data;
 
 	unsigned int m_vertexArrayObject;
 	unsigned int m_vertexBufferObject;

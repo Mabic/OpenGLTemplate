@@ -3,9 +3,8 @@
 
 #include "Light.hpp"
 
-Light::Light(glm::vec4 position, glm::vec3 color)
-	: m_position(position),
-	  m_color(color),
+Light::Light(const LightData& data)
+	: m_data(data),
 	  m_vertexArrayObject(0),
 	  m_vertexBufferObject(0),
 	  m_elementBufferObject(0),
@@ -14,24 +13,21 @@ Light::Light(glm::vec4 position, glm::vec3 color)
 
 }
 
-Light::Light(glm::vec4 position, glm::vec3 color, const Mesh& mesh)
-	: m_position(position),
-	  m_color(color)
+Light::Light(const LightData& data, const Mesh& mesh)
+	: m_data(data)
 {
 	InitializeBuffers(mesh);
 }
 
 Light::Light(Light&& light)
 {
-	m_position = light.m_position;
-	m_color = light.m_color;
+	m_data = light.m_data;
 	m_vertexArrayObject = light.m_vertexArrayObject;
 	m_vertexBufferObject = light.m_vertexBufferObject;
 	m_elementBufferObject = light.m_elementBufferObject;
 	m_indicesSize = light.m_indicesSize;
 
-	light.m_position = glm::vec4(0.0f);
-	light.m_color = glm::vec3(0.0f);
+	light.m_data = LightData();
 	light.m_vertexArrayObject = 0;
 	light.m_vertexBufferObject = 0;
 	light.m_elementBufferObject = 0;

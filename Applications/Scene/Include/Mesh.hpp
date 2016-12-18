@@ -33,14 +33,14 @@ struct Vertex {
 struct Material {
 
 	Material()
-		: m_ambient(glm::vec3(1.0f)),
-		  m_diffuse(glm::vec3(1.0f)),
-		  m_specular(glm::vec3(1.0f)),
+		: m_ambient(glm::vec4(1.0f)),
+		  m_diffuse(glm::vec4(1.0f)),
+		  m_specular(glm::vec4(1.0f)),
 		  m_shinines(1.0f)
 	{
 	}
 
-	Material(glm::vec3&& ambient, glm::vec3 diffuse, glm::vec3 specular, float shinines)
+	Material(glm::vec4&& ambient, glm::vec4 diffuse, glm::vec4 specular, float shinines)
 		: m_ambient(std::move(ambient)),
 		  m_diffuse(std::move(diffuse)),
 		  m_specular(std::move(specular)),
@@ -48,9 +48,9 @@ struct Material {
 	{
 	}
 
-	glm::vec3 m_ambient;
-	glm::vec3 m_diffuse;
-	glm::vec3 m_specular;
+	glm::vec4 m_ambient;
+	glm::vec4 m_diffuse;
+	glm::vec4 m_specular;
 	float m_shinines;
 };
 

@@ -4,22 +4,23 @@
 #include <glm\glm.hpp>
 
 struct Material;
+struct LightData;
 class Shader;
 
 class TransformationMaterialBuffer {
 public:
-	TransformationMaterialBuffer() = delete;
-	TransformationMaterialBuffer(const Shader*);
+	TransformationMaterialBuffer();
 	TransformationMaterialBuffer(const TransformationMaterialBuffer&) = delete;
 	TransformationMaterialBuffer(TransformationMaterialBuffer&&);
     ~TransformationMaterialBuffer();
 
-	void Initialize(const Shader*);
+	void Bind(const Shader*);
+	void UpdateMaterial(const Material&);
+	void UpdateLight(const LightData&);
+private:
+	void Initialize();
 	void CleanUp();
 
-	void UpdateMaterial(const Material&);
-	void UpdateLight(glm::vec4 position, glm::vec3 color);
-private:
 	unsigned int m_uniformBufferObject;
 };
 

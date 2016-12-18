@@ -81,8 +81,9 @@ void Application::Initialize()
 	glViewport(0, 0, m_windowWidth, m_windowHeight);
 	glEnable(GL_DEPTH_TEST);
 
-	SetUpObjects();
+	m_uniformBuffer.reset(new TransformationMaterialBuffer());
 
+	SetUpObjects();
 	SetUpLight();
 
 	InitializeAntTweakBar();
@@ -128,7 +129,7 @@ void Application::Render()
 
 			// transformations
 			glm::mat4 modelMatrix;
-			modelMatrix = glm::translate(modelMatrix, glm::vec3(m_lights[0].GetPosition()));
+			modelMatrix = glm::translate(modelMatrix, glm::vec3(m_lights[0].GetData().m_position));
 			glm::mat4 viewMatrix = m_camera.GetViewMatrix();
 			glm::mat4 projectionMatrix = glm::perspective(45.0f, static_cast<float>(m_windowWidth / m_windowHeight), 0.1f, 100.0f);
 
@@ -251,24 +252,20 @@ void Application::InitializeAntTweakBar()
 void Application::SetUpLight()
 {
 	ModelLoader lightModel(pathToModel + "cube\\cube.obj");
+	LightData light(glm::vec4(0.0f, 5.0f, 0.0f, 1.0f), glm::vec4(1.0f));
 
 	m_lightningShader.reset(new Shader(pathToShaders + "light.vert", pathToShaders + "light.frag"));
-
-	m_lights.push_back(Light(glm::vec4(0.0f, 5.0f, 0.0f, 1.0f), glm::vec3(1.0f), lightModel.GetMeshes().front()));
-
-	m_uniformBuffer->UpdateLight(m_lights[0].GetPosition(), m_lights[0].GetColor());
+	m_uniformBuffer->UpdateLight(light);
+	m_lights.push_back(Light(std::move(light), lightModel.GetMeshes().front()));
 }
 
 void Application::SetUpObjects()
 {
-	m_shader.reset(new Shader(pathToShaders + "vertex.vert", pathToShaders + "fragment.frag"));
-
-	m_uniformBuffer.reset(new TransformationMaterialBuffer(m_shader.get()));
-
 	ModelLoader modelLoader(pathToModel + "teapot\\teapot.obj");
-
 	const auto& meshes = modelLoader.GetMeshes();
 
+	m_shader.reset(new Shader(pathToShaders + "vertex.vert", pathToShaders + "fragment.frag"));
+	m_uniformBuffer->Bind(m_shader.get());
 	m_uniformBuffer->UpdateMaterial(meshes.back().GetMaterial());
 
 	for (const Mesh& mesh : meshes) {
