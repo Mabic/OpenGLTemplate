@@ -10,6 +10,7 @@
 
 #include "Application.hpp"
 #include "ModelLoader.hpp"
+#include "Light.hpp"
 #include "Object.hpp"
 #include "Shader.h"
 #include "TransformationMaterialUBO.hpp"
@@ -80,26 +81,15 @@ void Application::Initialize()
 	glViewport(0, 0, m_windowWidth, m_windowHeight);
 	glEnable(GL_DEPTH_TEST);
 
-	m_shader.reset(new Shader(pathToShaders + "vertex.vert", pathToShaders + "fragment.frag"));
+	SetUpObjects();
 
-	m_uniformBuffer.reset(new TransformationMaterialBuffer(m_shader.get()));
-
-	ModelLoader modelLoader (pathToModel + "teapot\\teapot.obj");
-
-	const auto& meshes = modelLoader.GetMeshes();
-
-	m_uniformBuffer->UpdateMaterial(meshes.back().GetMaterial());
-
-	for (const Mesh& mesh : meshes) {
-		m_objects.push_back(Object(mesh));
-	}
+	SetUpLight();
 
 	InitializeAntTweakBar();
 }
 
 void Application::Render()
 {
-	GLfloat angle = 0.0f;
 	while (!glfwWindowShouldClose(m_window))
 	{
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -119,7 +109,7 @@ void Application::Render()
 			glm::mat4 modelMatrix;
 			modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, -2.7f, -3.0f));
 			glm::mat4 viewMatrix = m_camera.GetViewMatrix();
-			glm::mat4 projectionMatrix = glm::perspective(45.0f, static_cast<float>(1024 / 768), 0.1f, 100.0f);
+			glm::mat4 projectionMatrix = glm::perspective(45.0f, static_cast<float>(m_windowWidth / m_windowHeight), 0.1f, 100.0f);
 
 			// pass transformation to vertex shader
 			GLint modelLocation = glGetUniformLocation(m_shader->GetProgram(), "model");
@@ -131,6 +121,27 @@ void Application::Render()
 			glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
 			object.Render(*m_shader);
+		}
+
+		{
+			m_lightningShader->UseProgram();
+
+			// transformations
+			glm::mat4 modelMatrix;
+			modelMatrix = glm::translate(modelMatrix, m_lights[0].GetPosition());
+			glm::mat4 viewMatrix = m_camera.GetViewMatrix();
+			glm::mat4 projectionMatrix = glm::perspective(45.0f, static_cast<float>(m_windowWidth / m_windowHeight), 0.1f, 100.0f);
+
+			// pass transformation to vertex shader
+			GLint modelLocation = glGetUniformLocation(m_lightningShader->GetProgram(), "model");
+			GLint viewLocation = glGetUniformLocation(m_lightningShader->GetProgram(), "view");
+			GLint projectionLocation = glGetUniformLocation(m_lightningShader->GetProgram(), "projection");
+
+			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+			glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+			glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
+			m_lights[0].Render();
 		}
 
 		TwDraw();
@@ -235,4 +246,31 @@ void Application::InitializeAntTweakBar()
 	}
 	glfwSetMouseButtonCallback(m_window, (GLFWmousebuttonfun)TwEventMouseButtonGLFW3);
 	glfwSetCharCallback(m_window, (GLFWcharfun)TwEventCharGLFW);
+}
+
+void Application::SetUpLight()
+{
+	ModelLoader lightModel(pathToModel + "cube\\cube.obj");
+
+	m_lightningShader.reset(new Shader(pathToShaders + "light.vert", pathToShaders + "light.frag"));
+
+	m_lights.push_back(Light(glm::vec4(0.0f, 5.0f, 0.0f, 1.0f), glm::vec3(1.0f), lightModel.GetMeshes().front()));
+
+}
+
+void Application::SetUpObjects()
+{
+	m_shader.reset(new Shader(pathToShaders + "vertex.vert", pathToShaders + "fragment.frag"));
+
+	m_uniformBuffer.reset(new TransformationMaterialBuffer(m_shader.get()));
+
+	ModelLoader modelLoader(pathToModel + "teapot\\teapot.obj");
+
+	const auto& meshes = modelLoader.GetMeshes();
+
+	m_uniformBuffer->UpdateMaterial(meshes.back().GetMaterial());
+
+	for (const Mesh& mesh : meshes) {
+		m_objects.push_back(Object(mesh));
+	}
 }

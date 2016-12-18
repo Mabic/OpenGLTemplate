@@ -10,7 +10,8 @@ SET( HEADERS
 	 ${HEADER_DIRECTORY}/ModelLoader.hpp
 	 ${HEADER_DIRECTORY}/Application.hpp 
 	 ${HEADER_DIRECTORY}/Object.hpp 
-	 ${HEADER_DIRECTORY}/TransformationMaterialUBO.hpp 
+	 ${HEADER_DIRECTORY}/TransformationMaterialUBO.hpp
+	 ${HEADER_DIRECTORY}/Light.hpp 
 )
 
 # list of sources
@@ -23,6 +24,7 @@ SET( SOURCES
 	 ${SOURCE_DIRECTORY}/Application.cpp
 	 ${SOURCE_DIRECTORY}/Object.cpp
 	 ${SOURCE_DIRECTORY}/TransformationMaterialUBO.cpp
+	 ${SOURCE_DIRECTORY}/Light.cpp
 )
 
 INCLUDE_DIRECTORIES( Include )

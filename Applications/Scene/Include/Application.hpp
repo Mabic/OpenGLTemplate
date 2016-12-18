@@ -9,6 +9,7 @@
 #include "Camera.hpp"
 
 struct GLFWwindow;
+class Light;
 class Object;
 class Shader;
 class TransformationMaterialBuffer;
@@ -34,6 +35,9 @@ private:
 
 	void InitializeAntTweakBar();
 
+	void SetUpLight();
+	void SetUpObjects();
+
 	// window definitions
 	GLFWwindow* m_window;
 	int m_windowWidth;
@@ -41,12 +45,16 @@ private:
 
 	// shaders
 	std::unique_ptr<Shader> m_shader;
+	std::unique_ptr<Shader> m_lightningShader;
 
 	// uniforms
 	std::unique_ptr<TransformationMaterialBuffer> m_uniformBuffer;
 
 	// meshes
 	std::vector<Object> m_objects;
+
+	// lights
+	std::vector<Light> m_lights;
 
 	// TweakBar
 	TwBar* m_TweakBar;
