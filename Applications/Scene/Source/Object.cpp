@@ -67,6 +67,9 @@ void Object::InitializeBuffers(const Mesh& mesh)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 8, (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 8, (GLvoid*)(sizeof(GL_FLOAT) * 3));
+	glEnableVertexAttribArray(1);
+
 	// Texture
 	if (m_isTextureExist) {
 		glGenTextures(1, &m_textureBufferObject);
@@ -75,8 +78,8 @@ void Object::InitializeBuffers(const Mesh& mesh)
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 8, (GLvoid*)(sizeof(GL_FLOAT) * 6));
-	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 8, (GLvoid*)(sizeof(GL_FLOAT) * 6));
+	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
 
