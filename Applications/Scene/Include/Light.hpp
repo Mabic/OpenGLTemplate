@@ -15,7 +15,8 @@ public:
 	~Light();
 
 	void Render();
-	inline glm::vec3 GetPosition() const { return m_position; }
+	inline glm::vec4 GetPosition() const { return m_position; }
+	inline glm::vec3 GetColor() const { return m_color; }
 
 private:
 	void InitializeBuffers(const Mesh&);

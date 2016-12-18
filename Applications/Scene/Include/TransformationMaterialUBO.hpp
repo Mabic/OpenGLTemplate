@@ -1,6 +1,8 @@
 #ifndef TRANSFORMATION_MATERIAL_BUFFER
 #define TRANSFORMATION_MATERIAL_BUFFER
 
+#include <glm\glm.hpp>
+
 struct Material;
 class Shader;
 
@@ -16,6 +18,7 @@ public:
 	void CleanUp();
 
 	void UpdateMaterial(const Material&);
+	void UpdateLight(glm::vec4 position, glm::vec3 color);
 private:
 	unsigned int m_uniformBufferObject;
 };

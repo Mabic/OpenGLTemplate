@@ -128,7 +128,7 @@ void Application::Render()
 
 			// transformations
 			glm::mat4 modelMatrix;
-			modelMatrix = glm::translate(modelMatrix, m_lights[0].GetPosition());
+			modelMatrix = glm::translate(modelMatrix, glm::vec3(m_lights[0].GetPosition()));
 			glm::mat4 viewMatrix = m_camera.GetViewMatrix();
 			glm::mat4 projectionMatrix = glm::perspective(45.0f, static_cast<float>(m_windowWidth / m_windowHeight), 0.1f, 100.0f);
 
@@ -256,6 +256,7 @@ void Application::SetUpLight()
 
 	m_lights.push_back(Light(glm::vec4(0.0f, 5.0f, 0.0f, 1.0f), glm::vec3(1.0f), lightModel.GetMeshes().front()));
 
+	m_uniformBuffer->UpdateLight(m_lights[0].GetPosition(), m_lights[0].GetColor());
 }
 
 void Application::SetUpObjects()
