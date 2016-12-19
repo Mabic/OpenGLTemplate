@@ -78,6 +78,9 @@ void Application::Initialize()
 	glewExperimental = GL_TRUE;
 	glewInit();
 
+	// to reset error flags after glewInit
+	glGetError();
+
 	glViewport(0, 0, m_windowWidth, m_windowHeight);
 	glEnable(GL_DEPTH_TEST);
 
@@ -252,7 +255,7 @@ void Application::InitializeAntTweakBar()
 void Application::SetUpLight()
 {
 	ModelLoader lightModel(pathToModel + "cube\\cube.obj");
-	LightData light(glm::vec4(0.0f, 5.0f, 0.0f, 1.0f), glm::vec4(1.0f));
+	LightData light(glm::vec4(0.0f, 5.0f, 0.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	m_lightningShader.reset(new Shader(pathToShaders + "light.vert", pathToShaders + "light.frag"));
 	m_uniformBuffer->UpdateLight(light);

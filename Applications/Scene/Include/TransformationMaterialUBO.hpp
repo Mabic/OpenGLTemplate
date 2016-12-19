@@ -22,6 +22,7 @@ private:
 	void CleanUp();
 
 	unsigned int m_uniformBufferObject;
+	int m_uniformBufferAlignSize;
 };
 
 #endif /* TRANSFORMATION_MATERIAL_BUFFER */

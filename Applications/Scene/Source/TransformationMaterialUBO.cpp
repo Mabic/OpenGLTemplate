@@ -26,11 +26,13 @@ TransformationMaterialBuffer::~TransformationMaterialBuffer()
 
 void TransformationMaterialBuffer::Initialize()
 {
+	glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &m_uniformBufferAlignSize);
+
 	glGenBuffers(1, &m_uniformBufferObject);
 	glBindBuffer(GL_UNIFORM_BUFFER, m_uniformBufferObject);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(Material) + sizeof(LightData), NULL, GL_STATIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, m_uniformBufferAlignSize + sizeof(LightData), NULL, GL_STATIC_DRAW);
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, m_uniformBufferObject, 0, sizeof(Material));
-	glBindBufferRange(GL_UNIFORM_BUFFER, 1, m_uniformBufferObject, sizeof(Material), sizeof(LightData));
+	glBindBufferRange(GL_UNIFORM_BUFFER, 1, m_uniformBufferObject, m_uniformBufferAlignSize, sizeof(LightData));
 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
@@ -62,7 +64,7 @@ void TransformationMaterialBuffer::UpdateLight(const LightData& light)
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, m_uniformBufferObject);
 
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(Material), sizeof(LightData), &light);
+	glBufferSubData(GL_UNIFORM_BUFFER, m_uniformBufferAlignSize, sizeof(LightData), &light);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
