@@ -17,6 +17,7 @@ public:
     ~Camera();
 
     glm::mat4 GetViewMatrix() const;
+	inline const glm::vec3& GetPosition() const { return m_position; }
     void UpdateEulerAngles(float offsetX, float offsetY);
 	void UpdatePosition(DIRECTION direction);
 

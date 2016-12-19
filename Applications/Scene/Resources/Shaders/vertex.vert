@@ -8,6 +8,8 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform vec3 cameraPosition;
+
 out vec2 outTextureCoord;
 
 void main()

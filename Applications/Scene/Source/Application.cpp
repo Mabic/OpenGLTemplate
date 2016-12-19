@@ -140,10 +140,12 @@ void Application::Render()
 			GLint modelLocation = glGetUniformLocation(m_lightningShader->GetProgram(), "model");
 			GLint viewLocation = glGetUniformLocation(m_lightningShader->GetProgram(), "view");
 			GLint projectionLocation = glGetUniformLocation(m_lightningShader->GetProgram(), "projection");
+			GLint cameraLocation = glGetUniformLocation(m_lightningShader->GetProgram(), "cameraPosition");
 
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 			glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 			glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+			glUniform3fv(cameraLocation, 1, &m_camera.GetPosition()[0]);
 
 			m_lights[0].Render();
 		}
