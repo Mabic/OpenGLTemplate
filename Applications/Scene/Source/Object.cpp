@@ -41,9 +41,11 @@ void Object::Render(const Shader& shader)
 	glBindVertexArray(m_vertexArrayObject);
 
 	// textures
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_textureBufferObject);
-	glUniform1i(glGetUniformLocation(shader.GetProgram(), "textureSampler"), 0);
+	if (m_isTextureExist) {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_textureBufferObject);
+		glUniform1i(glGetUniformLocation(shader.GetProgram(), "textureSampler"), 0);
+	}
 
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indicesSize), GL_UNSIGNED_INT, 0);
 }

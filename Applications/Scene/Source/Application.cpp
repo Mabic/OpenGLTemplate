@@ -94,6 +94,7 @@ void Application::Initialize()
 
 void Application::Render()
 {
+	float angle = 0.0f;
 	while (!glfwWindowShouldClose(m_window))
 	{
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -102,6 +103,7 @@ void Application::Render()
 		m_shader->UseProgram();
 		glfwPollEvents();
 		CameraMovement();
+		angle += 0.01f;
 
 		for (Object& object : m_objects) {
 
@@ -111,7 +113,8 @@ void Application::Render()
 
 			// transformations
 			glm::mat4 modelMatrix;
-			modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, -2.7f, -3.0f));
+			modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, -0.0f, -6.0f));
+			modelMatrix = glm::rotate(modelMatrix, angle, glm::vec3(0.0f, 1.0f, 0.0f));
 			glm::mat4 viewMatrix = m_camera.GetViewMatrix();
 			glm::mat4 projectionMatrix = glm::perspective(45.0f, static_cast<float>(m_windowWidth / m_windowHeight), 0.1f, 100.0f);
 
@@ -119,10 +122,12 @@ void Application::Render()
 			GLint modelLocation = glGetUniformLocation(m_shader->GetProgram(), "model");
 			GLint viewLocation = glGetUniformLocation(m_shader->GetProgram(), "view");
 			GLint projectionLocation = glGetUniformLocation(m_shader->GetProgram(), "projection");
+			GLint cameraLocation = glGetUniformLocation(m_shader->GetProgram(), "cameraPosition");
 
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 			glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 			glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+			glUniform3fv(cameraLocation, 1, &m_camera.GetPosition()[0]);
 
 			object.Render(*m_shader);
 		}
@@ -133,6 +138,7 @@ void Application::Render()
 			// transformations
 			glm::mat4 modelMatrix;
 			modelMatrix = glm::translate(modelMatrix, glm::vec3(m_lights[0].GetData().m_position));
+			modelMatrix = glm::scale(modelMatrix, glm::vec3(0.3f, 0.3f, 0.3f));
 			glm::mat4 viewMatrix = m_camera.GetViewMatrix();
 			glm::mat4 projectionMatrix = glm::perspective(45.0f, static_cast<float>(m_windowWidth / m_windowHeight), 0.1f, 100.0f);
 
@@ -140,12 +146,10 @@ void Application::Render()
 			GLint modelLocation = glGetUniformLocation(m_lightningShader->GetProgram(), "model");
 			GLint viewLocation = glGetUniformLocation(m_lightningShader->GetProgram(), "view");
 			GLint projectionLocation = glGetUniformLocation(m_lightningShader->GetProgram(), "projection");
-			GLint cameraLocation = glGetUniformLocation(m_lightningShader->GetProgram(), "cameraPosition");
 
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 			glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 			glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-			glUniform3fv(cameraLocation, 1, &m_camera.GetPosition()[0]);
 
 			m_lights[0].Render();
 		}
@@ -257,7 +261,7 @@ void Application::InitializeAntTweakBar()
 void Application::SetUpLight()
 {
 	ModelLoader lightModel(pathToModel + "cube\\cube.obj");
-	LightData light(glm::vec4(0.0f, 5.0f, 0.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	LightData light(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	m_lightningShader.reset(new Shader(pathToShaders + "light.vert", pathToShaders + "light.frag"));
 	m_uniformBuffer->UpdateLight(light);
@@ -266,12 +270,12 @@ void Application::SetUpLight()
 
 void Application::SetUpObjects()
 {
-	ModelLoader modelLoader(pathToModel + "teapot\\teapot.obj");
+	ModelLoader modelLoader(pathToModel + "sphere\\sphere.obj");
 	const auto& meshes = modelLoader.GetMeshes();
 
 	m_shader.reset(new Shader(pathToShaders + "vertex.vert", pathToShaders + "fragment.frag"));
 	m_uniformBuffer->Bind(m_shader.get());
-	m_uniformBuffer->UpdateMaterial(meshes.back().GetMaterial());
+	m_uniformBuffer->UpdateMaterial(meshes[0].GetMaterial());
 
 	for (const Mesh& mesh : meshes) {
 		m_objects.push_back(Object(mesh));
