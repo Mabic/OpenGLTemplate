@@ -10,7 +10,7 @@ ModelLoader::ModelLoader(const std::string& pathToFile)
 
 	Assimp::Importer importer;
 
-	auto postprocessFlags = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_FlipUVs;
+	auto postprocessFlags = aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs;
 	const aiScene* scene = importer.ReadFile(pathToFile, postprocessFlags);
 
 	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
