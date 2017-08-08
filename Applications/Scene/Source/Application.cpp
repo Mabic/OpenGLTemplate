@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <functional>
 
+#include <imgui.h>
+#include <imgui_impl_glfw_gl3.h>
+
 #include "Application.hpp"
 #include "ModelLoader.hpp"
 #include "Light.hpp"
@@ -31,6 +34,7 @@ void Application::GLFWCallbackWrapper::MousePositionCallback(GLFWwindow* window,
 void Application::GLFWCallbackWrapper::KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	s_application->KeyboardCallback(window, key, scancode, action, mods);
+	ImGui_ImplGlfwGL3_KeyCallback(window, key, scancode, action, mods);
 }
 
 void Application::GLFWCallbackWrapper::SetApplication(Application* application)
@@ -74,6 +78,9 @@ void Application::Initialize()
 
 	glfwMakeContextCurrent(m_window);
 
+	// Setup ImGui binding
+	ImGui_ImplGlfwGL3_Init(m_window, false);
+
 	SetCallbackFunctions();
 	SetInput();
 
@@ -95,6 +102,7 @@ void Application::Initialize()
 void Application::Render()
 {
 	float angle = 0.0f;
+
 	while (!glfwWindowShouldClose(m_window))
 	{
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -154,6 +162,20 @@ void Application::Render()
 			m_lights[0].Render();
 		}
 
+		
+		if (glfwGetInputMode(m_window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL)
+		{
+			ImGui_ImplGlfwGL3_NewFrame();
+
+			static float f = 0.0f;
+			ImGui::Text("Hello, world!");
+			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			ImGui::Render();
+		}
+
+		
+
 		glfwSwapBuffers(m_window);
 		glfwPollEvents();
 	}
@@ -161,6 +183,7 @@ void Application::Render()
 
 void Application::CleanUp()
 {
+	ImGui_ImplGlfwGL3_Shutdown();
 	glfwTerminate();
 }
 
@@ -169,6 +192,10 @@ void Application::SetCallbackFunctions()
 	GLFWCallbackWrapper::SetApplication(this);
 	glfwSetCursorPosCallback(m_window, GLFWCallbackWrapper::MousePositionCallback);
 	glfwSetKeyCallback(m_window, GLFWCallbackWrapper::KeyboardCallback);
+
+	glfwSetMouseButtonCallback(m_window, ImGui_ImplGlfwGL3_MouseButtonCallback);
+	glfwSetScrollCallback(m_window, ImGui_ImplGlfwGL3_ScrollCallback);
+	glfwSetCharCallback(m_window, ImGui_ImplGlfwGL3_CharCallback);
 }
 
 void Application::SetInput()
