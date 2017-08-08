@@ -32,8 +32,6 @@ private:
 	void KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	void CameraMovement();
 
-	void InitializeAntTweakBar();
-
 	void SetUpLight();
 	void SetUpObjects();
 
