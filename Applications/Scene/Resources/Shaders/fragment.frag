@@ -19,7 +19,8 @@ layout(std140) uniform Light {
 
 void main(void)
 {
-    vec4 combinedColor = ambient + diffuse + (specular * 0) + (shinines * 0);
-    vec4 calPost = color * position * 0;
-    outColor = position + calPost * combinedColor * 0;
+    //vec4 combinedColor = ambient + diffuse + (specular * 0) + (shinines * 0);
+    //vec4 calPost = color * position * 0;
+    //outColor = position + calPost * combinedColor * 0;
+	outColor = texture2D(textureSampler, outTextureCoord);
 }

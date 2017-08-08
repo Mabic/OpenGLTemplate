@@ -9,7 +9,7 @@ Camera::Camera(glm::vec3 && position, glm::vec3 && front, glm::vec3 && up)
       m_yaw(-90.0f),
       m_pitch(0.0f),
       m_sensitivity(0.1f),
-	  m_speed(0.1f)
+	  m_speed(0.001f)
 {}
 
 Camera::~Camera()

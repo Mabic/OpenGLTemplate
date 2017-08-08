@@ -13,7 +13,7 @@ SET( SOURCES
 
 INCLUDE_DIRECTORIES( Include )
 
-ADD_EXECUTABLE(emptyWindow  ${HEADERS} ${SOURCES})
+ADD_EXECUTABLE(emptyWindow ${HEADERS} ${SOURCES})
 
-TARGET_LINK_LIBRARIES (emptyWindow glfw3 glew32s glu32 opengl32)
+TARGET_LINK_LIBRARIES (emptyWindow opengl32 glfw3 glew32s )
 

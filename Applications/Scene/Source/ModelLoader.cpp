@@ -68,7 +68,7 @@ void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene)
 			{
 				aiString str;
 				materialNode->GetTexture(aiTextureType_DIFFUSE, i, &str);
-				textures.push_back(Texture(m_directory + "\\" + str.C_Str()));
+				textures.push_back(Texture(m_directory + "/" + str.C_Str()));
 			}
 		}
 
@@ -83,7 +83,7 @@ void ModelLoader::ProcessNode(const aiNode* node, const aiScene* scene)
 
 std::string ModelLoader::GetCurrentDirectory(const std::string& path) const
 {
-	return path.substr(0, path.find_last_of("\\"));
+	return path.substr(0, path.find_last_of("/"));
 }
 
 Material ModelLoader::GetMaterial(const aiMaterial* materialNode) const

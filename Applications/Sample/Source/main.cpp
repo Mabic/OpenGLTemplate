@@ -12,8 +12,10 @@
 
 GLFWwindow* window = nullptr;
 
-const std::string pathToShaders("C:\\Users\\mariu\\OneDrive\\Dokumenty\\Visual Studio 2015\\Projects\\OpenGLTemplate\\Applications\\Sample\\Resources\\Shaders\\");
-const std::string pathToTextures("C:\\Users\\mariu\\OneDrive\\Dokumenty\\Visual Studio 2015\\Projects\\OpenGLTemplate\\Applications\\Sample\\Resources\\Textures\\");
+const std::string pathToProject(PROJECT_PATH);
+
+const std::string pathToShaders(pathToProject + "/Applications/Sample/Resources/Shaders/");
+const std::string pathToTextures(pathToProject + "/Applications/Sample/Resources/Textures/");
 
 
 // VAO, VBO, EBO, TBO

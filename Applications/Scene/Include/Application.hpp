@@ -1,6 +1,5 @@
 #ifndef APPLICATION_HPP
 #define APPLICATION_HPP
-#include <AntTweakBar.h>
 
 #include <array>
 #include <memory>
@@ -55,9 +54,6 @@ private:
 
 	// lights
 	std::vector<Light> m_lights;
-
-	// TweakBar
-	TwBar* m_TweakBar;
 
 	// camera
 	Camera m_camera;

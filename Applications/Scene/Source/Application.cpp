@@ -16,9 +16,11 @@
 #include "TransformationMaterialUBO.hpp"
 
 namespace {
-	const std::string pathToShaders("C:\\Users\\mariu\\OneDrive\\Dokumenty\\Visual Studio 2015\\Projects\\OpenGLTemplate\\Applications\\Scene\\Resources\\Shaders\\");
-	const std::string pathToTexture("C:\\Users\\mariu\\OneDrive\\Dokumenty\\Visual Studio 2015\\Projects\\OpenGLTemplate\\Applications\\Scene\\Resources\\Textures\\");
-	const std::string pathToModel("C:\\Users\\mariu\\OneDrive\\Dokumenty\\Visual Studio 2015\\Projects\\OpenGLTemplate\\Applications\\Scene\\Resources\\Models\\");
+	const std::string pathToProject(PROJECT_PATH);
+
+	const std::string pathToShaders(pathToProject + "/Applications/Scene/Resources/Shaders/");
+	const std::string pathToTextures(pathToProject + "/Applications/Scene/Resources/Textures/");
+	const std::string pathToModel(pathToProject + "/Applications/Scene/Resources/Models/");
 }
 
 void Application::GLFWCallbackWrapper::MousePositionCallback(GLFWwindow* window, double positionX, double positionY)
@@ -88,8 +90,6 @@ void Application::Initialize()
 
 	SetUpObjects();
 	SetUpLight();
-
-	InitializeAntTweakBar();
 }
 
 void Application::Render()
@@ -103,7 +103,7 @@ void Application::Render()
 		m_shader->UseProgram();
 		glfwPollEvents();
 		CameraMovement();
-		angle += 0.01f;
+		angle += 0.000f;
 
 		for (Object& object : m_objects) {
 
@@ -154,8 +154,6 @@ void Application::Render()
 			m_lights[0].Render();
 		}
 
-		TwDraw();
-
 		glfwSwapBuffers(m_window);
 		glfwPollEvents();
 	}
@@ -163,7 +161,6 @@ void Application::Render()
 
 void Application::CleanUp()
 {
-	TwTerminate();
 	glfwTerminate();
 }
 
@@ -182,8 +179,6 @@ void Application::SetInput()
 
 void Application::MousePositionCallback(GLFWwindow* window, double positionX, double positionY)
 {
-	TwEventCursorPosGLFW3(window, positionX, positionY + 30.0);
-
 	int cursorMode = glfwGetInputMode(window, GLFW_CURSOR);
 
 	if (cursorMode != GLFW_CURSOR_DISABLED) {
@@ -219,8 +214,6 @@ void Application::KeyboardCallback(GLFWwindow* window, int key, int scancode, in
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
-
-	TwEventKeyGLFW3(window, key, scancode, action, mods);
 }
 
 void Application::CameraMovement()
@@ -242,25 +235,9 @@ void Application::CameraMovement()
 	}
 }
 
-void Application::InitializeAntTweakBar()
-{
-	TwInit(TW_OPENGL_CORE, NULL);
-	TwWindowSize(m_windowWidth, m_windowHeight);
-
-	m_TweakBar = TwNewBar("Meshes");
-	TwDefine("Meshes size='240 320'");
-	TwDefine("Meshes position='50 50'");
-	for (unsigned int meshID = 0; meshID < m_objects.size(); ++meshID) {
-		std::string name = std::to_string(meshID);
-		TwAddVarRW(m_TweakBar, name.c_str(), TW_TYPE_BOOLCPP, &m_objects[meshID].IsMeshRenderable(), "");
-	}
-	glfwSetMouseButtonCallback(m_window, (GLFWmousebuttonfun)TwEventMouseButtonGLFW3);
-	glfwSetCharCallback(m_window, (GLFWcharfun)TwEventCharGLFW);
-}
-
 void Application::SetUpLight()
 {
-	ModelLoader lightModel(pathToModel + "cube\\cube.obj");
+	ModelLoader lightModel(pathToModel + "cube/cube.obj");
 	LightData light(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	m_lightningShader.reset(new Shader(pathToShaders + "light.vert", pathToShaders + "light.frag"));
@@ -270,7 +247,7 @@ void Application::SetUpLight()
 
 void Application::SetUpObjects()
 {
-	ModelLoader modelLoader(pathToModel + "sphere\\sphere.obj");
+	ModelLoader modelLoader(pathToModel + "lost_empire/lost_empire.obj");
 	const auto& meshes = modelLoader.GetMeshes();
 
 	m_shader.reset(new Shader(pathToShaders + "vertex.vert", pathToShaders + "fragment.frag"));
