@@ -1,4 +1,3 @@
-#define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -68,7 +67,7 @@ void Application::Initialize()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, "Hello Triangle", NULL, NULL);
+	m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, "Scene", NULL, NULL);
 
 	if (!m_window) {
 		fprintf(stderr, "ERROR: could not open window with GLFW3\n");
@@ -167,11 +166,18 @@ void Application::Render()
 		{
 			ImGui_ImplGlfwGL3_NewFrame();
 
-			static float f = 0.0f;
-			ImGui::Text("Hello, world!");
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+			static float f = 1.0f;
+			ImGui::Text("Lighting");
+			ImGui::SliderFloat("Lighting power", &f, 0.0f, 1.0f);
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			ImGui::Render();
+
+			LightData lightData = m_lights.at(0).GetData();
+			
+			if (lightData.m_color != glm::vec4(f)) {
+				m_lights.at(0).UpdateLightData({ lightData.m_position, glm::vec4(f) });
+				m_uniformBuffer->UpdateLight(m_lights.at(0).GetData());
+			}
 		}
 
 		
@@ -265,7 +271,7 @@ void Application::CameraMovement()
 void Application::SetUpLight()
 {
 	ModelLoader lightModel(pathToModel + "cube/cube.obj");
-	LightData light(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	LightData light(glm::vec4(0.5f, -1.0f, 0.5f, 0.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	m_lightningShader.reset(new Shader(pathToShaders + "light.vert", pathToShaders + "light.frag"));
 	m_uniformBuffer->UpdateLight(light);
@@ -277,7 +283,7 @@ void Application::SetUpObjects()
 	ModelLoader modelLoader(pathToModel + "lost_empire/lost_empire.obj");
 	const auto& meshes = modelLoader.GetMeshes();
 
-	m_shader.reset(new Shader(pathToShaders + "vertex.vert", pathToShaders + "fragment.frag"));
+	m_shader.reset(new Shader(pathToShaders + "phongShading.vert", pathToShaders + "phongShadingTexture.frag"));
 	m_uniformBuffer->Bind(m_shader.get());
 	m_uniformBuffer->UpdateMaterial(meshes[0].GetMaterial());
 

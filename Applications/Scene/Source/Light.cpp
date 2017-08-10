@@ -1,4 +1,3 @@
-#define GLEW_STATIC
 #include <GL/glew.h>
 
 #include "Light.hpp"
@@ -37,6 +36,11 @@ Light::Light(Light&& light)
 Light::~Light()
 {
 	CleanUp();
+}
+
+void Light::UpdateLightData(LightData&& lightData)
+{
+	m_data = lightData;
 }
 
 void Light::Render()

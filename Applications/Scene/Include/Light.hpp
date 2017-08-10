@@ -27,6 +27,7 @@ public:
 	Light(Light&&);
 	~Light();
 
+	void UpdateLightData(LightData&&);
 	void Render();
 	inline const LightData& GetData() const { return m_data; }
 
