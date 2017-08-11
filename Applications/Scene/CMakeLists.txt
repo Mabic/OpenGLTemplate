@@ -11,7 +11,8 @@ SET( HEADERS
 	 ${HEADER_DIRECTORY}/Application.hpp 
 	 ${HEADER_DIRECTORY}/Object.hpp 
 	 ${HEADER_DIRECTORY}/TransformationMaterialUBO.hpp
-	 ${HEADER_DIRECTORY}/Light.hpp 
+	 ${HEADER_DIRECTORY}/Light.hpp
+	 ${HEADER_DIRECTORY}/Window.hpp
 )
 
 # list of sources
@@ -25,6 +26,7 @@ SET( SOURCES
 	 ${SOURCE_DIRECTORY}/Object.cpp
 	 ${SOURCE_DIRECTORY}/TransformationMaterialUBO.cpp
 	 ${SOURCE_DIRECTORY}/Light.cpp
+	 ${SOURCE_DIRECTORY}/Window.cpp
 )
 
 INCLUDE_DIRECTORIES( Include )
